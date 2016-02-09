@@ -1,0 +1,6 @@
+module.exports = {
+  "user": "<email>",
+  "pass": "<password>",
+  "googleAPI": "<Google Developer API key>",
+  "cx": "<Google Custom Search key>"
+}

@@ -1,0 +1,30 @@
+{
+  "name": "discobot-js",
+  "version": "1.0.0",
+  "description": "A fun discord project.",
+  "main": "discobot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/macdeth/discobot-js.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "chat"
+  ],
+  "author": "MacDeth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/macdeth/discobot-js/issues"
+  },
+  "homepage": "https://github.com/macdeth/discobot-js#readme",
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "discord.js": "^6.0.0",
+    "querystring": "^0.2.0",
+    "request": "^2.69.0"
+  }
+}
