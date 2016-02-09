@@ -9,7 +9,7 @@ var bot = new Discord.Client();
 var botInfo = {};
 var token = "";
 var imageOK = true;
-var botInfo = require('config');
+var botInfo = require('./config.js');
 
 // fs.access("config.json", fs.R_OK, function(err){
 //   if(err){
