@@ -179,18 +179,9 @@ var cmdBattery = [
   {
     match: /^discobot,\s+help/,
     exec: function(message){
-      bot.reply(message, "You can use me by using one of the following commands:\n"+
-        "discobot, uptime\n"+
-        "discobot, cake me\n"+
-        "discobot, channel me\n"+
-        "ping\n"+
-        "discobot, about\n"+
-        "discobot, quote [quote goes here]\n"+
-        "discobot, quote me\n"+
-        "xxdyyy (x's are # of dice, y's are # of sides) the max roll is 99d999\n"+
-        "discobot, set game [whatever goes here]\n"+
-        "discobot, image me [query]\n"+
-        "discobot, help"
+      bot.reply(message,
+        "You can use me with the commands listed on "+
+        "https://github.com/MacDeth/discobot-js/wiki/Chat-Triggers"
       );
     }
   },
