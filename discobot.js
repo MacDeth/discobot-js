@@ -328,7 +328,7 @@ var cmdBattery = [
       var msg = message.content.toLowerCase();
       googleImageSearch(
         msg.match(/^discobot,\s+smut\s+me\s+(.+)/)[1],
-        "gif",
+        null,
         false,
         message,
         function(link){
