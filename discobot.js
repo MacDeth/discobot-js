@@ -189,7 +189,10 @@ var cmdBattery = [
     match: /^discobot,\s+tell\s+me\s+about\s+yourself|^discobot,\s+about/,
     exec: function(message){
       bot.reply(message, "I'm written by MacDeth with the help of the discord.js"+
-      " unofficial API.\nhttp://steamcommunity.com/id/macdeth");
+        " unofficial API.\nhttp://steamcommunity.com/id/macdeth\n"+
+        "https://github.com/MacDeth/discobot-js\n"+
+        "https://github.com/hydrabolt/discord.js/"
+      );
     }
   },
   {
