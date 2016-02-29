@@ -1,6 +1,6 @@
 module.exports = {
-  "user": "<email>",
-  "pass": "<password>",
+  "user": "<discord email>",
+  "pass": "<discord password>",
   "googleAPI": "<Google Developer API key>",
   "cx": "<Google Custom Search Engine ID>"
 }
