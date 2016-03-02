@@ -4,6 +4,7 @@ var request = require("request");
 var fs = require("fs");
 var process = require("process");
 const chalk = require("chalk");
+var moment = require("moment");
 
 var bot = new Discord.Client();
 var botInfo = {};
@@ -35,14 +36,20 @@ var botInfo = require('./config.js');
 
 token = bot.login(botInfo.user, botInfo.pass, function(err){
   if(err){
-    console.error(chalk.bold.red("[ERROR] Bad login: "+err));
+    console.error(
+      chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+      " [ERROR] Bad login: "+err)
+    );
     process.exit(1);
   }
 });
 
 
 bot.on("ready", function(){
-  console.log(chalk.bold.blue("[INFO] Connected as: "+botInfo.user));
+  console.log(
+    chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+    " [INFO] Connected as: "+botInfo.user)
+  );
   var servers = bot.servers;
   var channels = bot.channels;
 });
@@ -51,11 +58,17 @@ var quotes = {};
 
 fs.access("quotes.json", fs.R_OK | fs.W_OK, function(err){
   if(err)
-    console.error(chalk.bold.red("[ERROR] "+err));
+    console.error(
+      chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+      " [ERROR] "+err)
+    );
   else{
     fs.readFile("quotes.json", function(err, data){
       if(err){
-        console.error(chalk.bold.red("[ERROR] "+err));
+        console.error(
+          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [ERROR] "+err)
+        );
       }else{
         quotes = JSON.parse(data);
       }
@@ -74,11 +87,17 @@ process.stdin.on("data", function(data) {
       }
     }
   }
-  console.log(chalk.bold.blue("[INFO] Command entered via terminal."));
+  console.log(
+    chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+    " [INFO] Command entered via terminal.")
+  );
 });
 
 bot.on("warn", function(warning){
-  console.error(chalk.yellow("[WARN] "+warning));
+  console.error(
+    chalk.yellow(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+    " [WARN] "+warning)
+  );
 });
 
 var lastMessage;
@@ -90,9 +109,15 @@ bot.on("message", function(message){
   var msg = message.content.toLowerCase();
   if(message.author.username != bot.user.username){
     if(!message.channel.isPrivate){
-      console.log(chalk.bold.blue("[INFO] Server: "+message.channel.server.name));
+      console.log(
+        chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [INFO] Server: "+message.channel.server.name)
+      );
     }else{
-      console.log(chalk.bold.blue("[INFO] Private:"));
+      console.log(
+        chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [INFO] Private:")
+      );
     }
     lastMessage = message;
     console.log(message.channel.name+" "+message.author.id+" "+message.author.username+
@@ -242,11 +267,17 @@ var cmdBattery = [
           bot.reply(message, "Quote recorded - "+quote);
           fs.open("quotes.json","w+", function(err, fd){
             if(err){
-              console.error(chalk.bold.red("[ERROR] "+err));
+              console.error(
+                chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+                " [ERROR] "+err)
+              );
             }else{
               fs.write(fd, JSON.stringify(quotes), function(err){
                 if(err)
-                  console.error(chalk.bold.red("[ERROR] "+err));
+                  console.error(
+                    chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+                    " [ERROR] "+err)
+                  );
                 fs.close(fd);
               });
             }
@@ -364,7 +395,10 @@ var cmdBattery = [
             bot.sendMessage(message, link);
         });
       }else{
-        console.log(chalk.bold.blue("[INFO] Kept from unintentional bugging of Google API."));
+        console.log(chalk.bold.blue(
+          moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [INFO] Kept from unintentional bugging of Google API.")
+        );
       }
     }
   },
@@ -372,7 +406,10 @@ var cmdBattery = [
     match: /^discobot,\s+override\s+image\s+block/,
     exec: function(message){
       imageOK = true;
-      console.log(chalk.bold.blue("[INFO] Imageblock deactivated."));
+      console.log(
+        chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [INFO] Imageblock deactivated.")
+      );
     }
   },
   {
@@ -412,7 +449,10 @@ var cmdBattery = [
     exec: function(message){
       var said = message.content.match(/^discobot,\s+say\s+(.+)/)[1];
       bot.sendMessage(message, said);
-      console.log(chalk.bold.blue("[INFO] Discobot said: "+said));
+      console.log(
+        chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [INFO] Discobot said: "+said)
+      );
     }
   }
 ];
@@ -466,8 +506,11 @@ function googleImageSearch(query, type, safe, message, callback){
         bot.sendMessage(message, "Failed to procure an image, sorry :'(\n"+
           "This is probably because I hit my query limit. Next batch ready in "+
           countdown+" hours.");
-        console.error(chalk.bold.red("[ERROR] Failed to procure image. Status code: "+
-          response.statusCode));
+        console.error(
+          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [ERROR] Failed to procure image. Status code: "+
+          response.statusCode)
+        );
         return;
       }
   });
@@ -487,8 +530,8 @@ function youtubeSearch(query, callback){ // 100 unit impact on quota
       if(!error && response.statusCode === 200){
         jBody = JSON.parse(body);
         console.log(
-          chalk.bold.blue(
-            "[INFO] "+jBody.pageInfo.totalResults+" YouTube results.\n"+
+          chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+            " [INFO] "+jBody.pageInfo.totalResults+" YouTube results.\n"+
             "ETag: "+jBody.etag+" "+
             "Item array undefined: "+(typeof jBody.items === "undefined")
           )
@@ -505,7 +548,10 @@ function youtubeSearch(query, callback){ // 100 unit impact on quota
         }
         return;
       }else{
-        console.error(chalk.bold.red("[ERROR] Error may exist. Response: "+response.statusCode));
+        console.error(
+          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [ERROR] Error may exist. Response: "+response.statusCode)
+        );
       }
     }
   );
