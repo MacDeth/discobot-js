@@ -454,6 +454,21 @@ var cmdBattery = [
         " [INFO] Discobot said: "+said)
       );
     }
+  },
+  {
+    match: /^\(╯°□°）╯︵ ┻━┻|\(╯°□°\)╯︵ ┻━┻/,
+    exec: function(message){
+      var list = [
+        "(ﾉಥ益ಥ）ﾉ﻿ ┻━┻", 
+        "┬──┬﻿ ¯\\_(ツ)", 
+        "┻━┻ ︵ヽ(`Д´)ﾉ︵﻿ ┻━┻", 
+        "┻━┻ ︵﻿ ¯\\(ツ)/¯ ︵ ┻━┻", 
+        "┬─┬ノ( º _ ºノ)", 
+        "(ノಠ益ಠ)ノ彡┻━┻", 
+        "(J °O°)J JL_JL v-v /(°_°/)"
+      ];
+      bot.sendMessage(message, random(list));
+    }
   }
 ];
 
