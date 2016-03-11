@@ -54,27 +54,28 @@ bot.on("ready", function(){
   var channels = bot.channels;
 });
 
-var quotes = {};
+var quotes = {}
+readJSON("quotes.json", function(jsonShit){ quotes = jsonShit; });
 
-fs.access("quotes.json", fs.R_OK | fs.W_OK, function(err){
-  if(err)
-    console.error(
-      chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-      " [ERROR] "+err)
-    );
-  else{
-    fs.readFile("quotes.json", function(err, data){
-      if(err){
-        console.error(
-          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-          " [ERROR] "+err)
-        );
-      }else{
-        quotes = JSON.parse(data);
-      }
-    });
-  }
-});
+// fs.access("quotes.json", fs.R_OK | fs.W_OK, function(err){
+//   if(err)
+//     console.error(
+//       chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+//       " [ERROR] "+err)
+//     );
+//   else{
+//     fs.readFile("quotes.json", function(err, data){
+//       if(err){
+//         console.error(
+//           chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+//           " [ERROR] "+err)
+//         );
+//       }else{
+//         quotes = JSON.parse(data);
+//       }
+//     });
+//   }
+// });
 
 process.stdin.on("data", function(data) {
   if(lastMessage){
@@ -213,8 +214,9 @@ var cmdBattery = [
   {
     match: /^discobot,\s+tell\s+me\s+about\s+yourself|^discobot,\s+about/,
     exec: function(message){
+      var pack = readJSON("package.json");
       bot.reply(message, "I'm written by MacDeth with the help of the discord.js"+
-        " unofficial API.\nhttp://steamcommunity.com/id/macdeth\n"+
+        " unofficial API. My version is: "+pack.version+"\nhttp://steamcommunity.com/id/macdeth\n"+
         "https://github.com/MacDeth/discobot-js\n"+
         "https://github.com/hydrabolt/discord.js/"
       );
@@ -239,8 +241,7 @@ var cmdBattery = [
         }
       }
       
-      bot.reply(message, "Your roll is: "+answer+"\n"+
-        answerA.join(" + "));
+      bot.reply(message, "Your roll is: "+answer+"\n"+answerA.join(" + "));
     }
   },
   {
@@ -541,7 +542,7 @@ function youtubeSearch(query, callback){ // 100 unit impact on quota
     safeSearch: "none"
   }
   request("https://www.googleapis.com/youtube/v3/search?"+querystring.stringify(qs),
-    function(error, response, body){ // May need to worry about ETag later.
+    function(error, response, body){ // TODO: May need to worry about ETag later.
       if(!error && response.statusCode === 200){
         jBody = JSON.parse(body);
         console.log(
@@ -585,6 +586,31 @@ function getServers(){
 
 function getChannels(){
   
+}
+
+function readJSON(fileLocation, callback){
+  fs.access(fileLocation, fs.R_OK | fs.W_OK, function(err){
+    if(err){
+      console.error(
+        chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [ERROR] "+err)
+      );
+      callback(null);
+    }else{
+      fs.readFile(fileLocation, function(err, data){
+        if(err){
+          console.error(
+            chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+            " [ERROR] "+err)
+          );
+          callback(null);
+        }else{
+          //console.log("Reading JSON worked!");
+          callback(JSON.parse(data));
+        }
+      });
+    }
+  });
 }
 
 // function imageFail(message){
