@@ -249,30 +249,17 @@ module.exports = function(bot){
     {
       match: /guarantee/,
       exec: function(message){
-        if(imageOK){
-          googleImageSearch("george zimmer copypasta",
-            null,
-            true,
-            message,
-            function(link){
-              bot.sendMessage(message, link);
-          });
-        }else{
-          console.log(chalk.bold.blue(
-            moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-            " [INFO] Kept from unintentional bugging of Google API.")
-          );
-        }
-      }
-    },
-    {
-      match: /^discobot,\s+override\s+image\s+block/,
-      exec: function(message){
-        imageOK = true;
-        console.log(
-          chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-          " [INFO] Imageblock deactivated.")
+        googleImageSearch("george zimmer copypasta",
+          null,
+          true,
+          message,
+          function(link){
+            bot.sendMessage(message, link);
+          }
         );
+        // console.log(chalk.bold.blue(
+        //   moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        //   " [INFO] Kept from unintentional bugging of Google API.")
       }
     },
     {
@@ -294,10 +281,12 @@ module.exports = function(bot){
       exec: function(message){
         var msg = message.content.toLowerCase();
         if(msg.match(/^discobot,\s+set\s+game\s+.+/)){
-          bot.setPlayingGame(message.content.match(/^discobot,\s+set\s+game\s+(.+)/i)[1], function(err){
-            if(err)
-              console.error(chalk.bold.red("Failure to set status.\n"+err));
-          });
+          bot.setPlayingGame(message.content.match(/^discobot,\s+set\s+game\s+(.+)/i)[1],
+            function(err){
+              if(err)
+                console.error(chalk.bold.red("Failure to set status.\n"+err));
+            }
+          );
         }
         if(msg.match(/^discobot,\s+set\s+channel\s+.+/)){
           
@@ -332,6 +321,166 @@ module.exports = function(bot){
         ];
         bot.sendMessage(message, random(list));
       }
-    }
+    }//,
+    // {
+    //   match:/^discobot\s+level/,
+    //   exec: function(message){
+    //     bot.sendMessage(message, "This feature coming soon!");
+    //     if(false){
+    //       
+    //     }
+    //   }
+    // },
+    // {
+    //   match:/^discobot,\s+create\s+vote\s+[\w\s?!.]+,[\w\s?!.,]+/,
+    //   exec: function(message){
+    //     info = /^discobot,\s+create\s+vote\s+[\w\s?!.]+,[\w\s?!.,]+/.exec(msg.content);
+    //     vote = {
+    //       query: "",
+    //       options: []
+    //     }
+    //     bot.sendMessage(message,"");
+    //   }
+    // }
   ];
 };
+
+function googleImageSearch(query, type, safe, message, callback){
+  var qs = {
+    key: botInfo.googleAPI,
+    cx: botInfo.cx,
+    q: query,
+    searchType: "image",
+    prettyPrint: false
+  }
+  if(type){
+    qs.fileType = type;
+  }
+  if(safe){
+    qs.safe = "medium";
+  }else{
+    qs.safe = "off";
+  }
+  request("https://www.googleapis.com/customsearch/v1?"+querystring.stringify(qs),
+    function(error, response, body){
+      if(!error && response.statusCode === 200){
+        jBody = JSON.parse(body);
+        console.log(
+          chalk.bold.blue(
+            "[INFO] "+jBody.searchInformation.formattedTotalResults+
+            " results\nIn "+jBody.searchInformation.formattedSearchTime+" seconds."
+          )
+        );
+        console.log(
+          chalk.bold.blue(
+            "[INFO] Items array undefined? "+(typeof jBody.items === "undefined")
+          )
+        );
+        img = random(jBody.items);
+        if(typeof img === "undefined"){
+          return;
+        }
+        callback(img.link);
+        return;
+      }else{
+        imageOK = false;
+        var hour = Math.floor((Date.now()%86400000)/3600000); // 86.4M for # of ms/day. 3.6M for # of ms/hour
+        var countdown = 0;
+        if(hour > 8){ // UTC hour for quota reset
+          countdown = (24-hour)+8;
+        }else{
+          countdown = 8-hour;
+        }
+        bot.sendMessage(message, "Failed to procure an image, sorry :'(\n"+
+          "This is probably because I hit my query limit. Next batch ready in "+
+          countdown+" hours.");
+        console.error(
+          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [ERROR] Failed to procure image. Status code: "+
+          response.statusCode)
+        );
+        return;
+      }
+  });
+}
+
+function youtubeSearch(query, callback){ // 100 unit impact on quota
+  var qs = {
+    key: botInfo.googleAPI,
+    part: "snippet",
+    // maxresults: 5, // default value, 0-50 inclusive
+    q: query,
+    type: "video,channel",
+    safeSearch: "none"
+  }
+  request("https://www.googleapis.com/youtube/v3/search?"+querystring.stringify(qs),
+    function(error, response, body){ // TODO: May need to worry about ETag later.
+      if(!error && response.statusCode === 200){
+        jBody = JSON.parse(body);
+        console.log(
+          chalk.bold.blue(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+            " [INFO] "+jBody.pageInfo.totalResults+" YouTube results.\n"+
+            "ETag: "+jBody.etag+" "+
+            "Item array undefined: "+(typeof jBody.items === "undefined")
+          )
+        );
+        
+        result = random(jBody.items);
+        if(typeof result !== "undefined"){
+          console.log(result.id.kind);
+          if(result.id.kind === "youtube#video"){
+            callback("https://www.youtube.com/watch?v="+result.id.videoId);
+          }else if(result.id.kind === "youtube#channel"){
+            callback("https://www.youtube.com/channel/"+result.id.channelId);
+          }
+        }
+        return;
+      }else{
+        console.error(
+          chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+          " [ERROR] Error may exist. Response: "+response.statusCode)
+        );
+      }
+    }
+  );
+}
+
+function random(array){
+  if(typeof array === "undefined"){
+    return array;
+  }
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function getServers(){
+  
+}
+
+function getChannels(){
+  
+}
+
+function readJSON(fileLocation, callback){
+  fs.access(fileLocation, fs.R_OK | fs.W_OK, function(err){
+    if(err){
+      console.error(
+        chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+        " [ERROR] "+err)
+      );
+      callback(null);
+    }else{
+      fs.readFile(fileLocation, function(err, data){
+        if(err){
+          console.error(
+            chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+            " [ERROR] "+err)
+          );
+          callback(null);
+        }else{
+          //console.log("Reading JSON worked!");
+          callback(JSON.parse(data));
+        }
+      });
+    }
+  });
+}
