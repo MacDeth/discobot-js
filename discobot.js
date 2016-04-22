@@ -1,7 +1,4 @@
 var Discord = require("discord.js");
-var querystring = require("querystring");
-var request = require("request");
-var fs = require("fs");
 var process = require("process");
 var chalk = require("chalk");
 var moment = require("moment");
@@ -11,7 +8,7 @@ var botInfo = {};
 var token = "";
 var imageOK = true;
 var botInfo = require('./config.js');
-var cmds = require('./cmds.js')(bot);
+var cmds = require('./cmds.js')(bot, botInfo);
 
 // fs.access("config.json", fs.R_OK, function(err){
 //   if(err){
@@ -54,29 +51,6 @@ bot.on("ready", function(){
   var servers = bot.servers;
   var channels = bot.channels;
 });
-
-var quotes = {}
-readJSON("quotes.json", function(jsonShit){ quotes = jsonShit; });
-
-// fs.access("quotes.json", fs.R_OK | fs.W_OK, function(err){
-//   if(err)
-//     console.error(
-//       chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-//       " [ERROR] "+err)
-//     );
-//   else{
-//     fs.readFile("quotes.json", function(err, data){
-//       if(err){
-//         console.error(
-//           chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
-//           " [ERROR] "+err)
-//         );
-//       }else{
-//         quotes = JSON.parse(data);
-//       }
-//     });
-//   }
-// });
 
 process.stdin.on("data", function(data) {
   if(lastMessage){
@@ -137,17 +111,3 @@ bot.on("message", function(message){
     channels = bot.channels;
   }
 });
-
-
-// function imageFail(message){
-//   var hour = Math.floor((Date.now()%86400000)/3600000); // 86.4M for # of ms/day. 3.6M for # of ms/hour
-//   var countdown = 0;
-//   if(hour > 8){ // UTC hour for quota reset
-//     countdown = (24-hour)+8;
-//   }else{
-//     countdown = 8-hour;
-//   }
-//   bot.sendMessage(message, "Failed to procure an image, sorry :'(\n"+
-//     "This is probably because I hit my query limit. Next batch ready in "+countdown+" hours.");
-//   console.log("[INFO] Kept bot from pestering Google API.");
-// }

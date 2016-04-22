@@ -1,4 +1,12 @@
-module.exports = function(bot){
+var fs = require("fs");
+var request = require("request");
+var querystring = require("querystring");
+var chalk = require("chalk");
+
+var quotes = {}
+readJSON("quotes.json", function(jsonShit){ quotes = jsonShit; });
+
+module.exports = function(bot, botInfo){
   return [
     {
       match: /^ping$/,
@@ -174,7 +182,7 @@ module.exports = function(bot){
       match: /^discobot,\s+image\s+me\s+.+/,
       exec: function(message){
         var msg = message.content.toLowerCase();
-        googleImageSearch(msg.match(
+        googleImageSearch(botInfo, msg.match(
           /^discobot,\s+image\s+me\s+(.+)/)[1],
           null,
           true,
@@ -189,7 +197,7 @@ module.exports = function(bot){
       exec: function(message){
         var msg = message.content.toLowerCase();
         // if(imageOK){
-        googleImageSearch(msg.match(
+        googleImageSearch(botInfo, msg.match(
           /^discobot,\s+animate\s+me\s+(.+)/)[1],
           "gif",
           false,
@@ -209,7 +217,7 @@ module.exports = function(bot){
         var randIndex = Math.floor(Math.random()*8);
         var pugQueries = ["pug","pug cute","pug derp","pug dumb","pug fat",
           "pug long","pug meme","pugs not drugs"];
-        googleImageSearch(
+        googleImageSearch(botInfo,
           pugQueries[randIndex],
           null,
           true,
@@ -223,7 +231,7 @@ module.exports = function(bot){
       match: /^discobot,\s+smut\s+me.+/,
       exec: function(message){
         var msg = message.content.toLowerCase();
-        googleImageSearch(
+        googleImageSearch(botInfo, 
           msg.match(/^discobot,\s+smut\s+me\s+(.+)/)[1],
           null,
           false,
@@ -238,7 +246,7 @@ module.exports = function(bot){
       match: /^discobot,\s+youtube\s+me\s+.+/,
       exec: function(message){
         var msg = message.content.toLowerCase();
-        youtubeSearch(
+        youtubeSearch(botInfo,
           msg.match(/^discobot,\s+youtube\s+me\s+(.+)/)[1],
           function(link){
             bot.sendMessage(message, link);
@@ -249,7 +257,7 @@ module.exports = function(bot){
     {
       match: /guarantee/,
       exec: function(message){
-        googleImageSearch("george zimmer copypasta",
+        googleImageSearch(botInfo, "george zimmer copypasta",
           null,
           true,
           message,
@@ -345,7 +353,7 @@ module.exports = function(bot){
   ];
 };
 
-function googleImageSearch(query, type, safe, message, callback){
+function googleImageSearch(botInfo, query, type, safe, message, callback){
   var qs = {
     key: botInfo.googleAPI,
     cx: botInfo.cx,
@@ -404,7 +412,7 @@ function googleImageSearch(query, type, safe, message, callback){
   });
 }
 
-function youtubeSearch(query, callback){ // 100 unit impact on quota
+function youtubeSearch(botInfo, query, callback){ // 100 unit impact on quota
   var qs = {
     key: botInfo.googleAPI,
     part: "snippet",
