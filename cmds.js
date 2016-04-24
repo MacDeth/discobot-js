@@ -368,7 +368,7 @@ module.exports = function(bot, botInfo){
           });
         }
       }
-    },
+    }
     // {
     //   match:/^discobot,\s+create\s+vote\s+[\w\s?!.]+,[\w\s?!.,]+/,
     //   exec: function(message){
