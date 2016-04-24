@@ -3,8 +3,10 @@ var request = require("request");
 var querystring = require("querystring");
 var chalk = require("chalk");
 
-var quotes = {}
+var quotes = {};
 readJSON("quotes.json", function(jsonShit){ quotes = jsonShit; });
+var skills = {};
+readJSON("stats.json", function(jsonShit){ skills = jsonShit; });
 
 module.exports = function(bot, botInfo){
   return [
@@ -329,16 +331,44 @@ module.exports = function(bot, botInfo){
         ];
         bot.sendMessage(message, random(list));
       }
-    }//,
-    // {
-    //   match:/^discobot\s+level/,
-    //   exec: function(message){
-    //     bot.sendMessage(message, "This feature coming soon!");
-    //     if(false){
-    //       
-    //     }
-    //   }
-    // },
+    },
+    {
+      match:/^discobot,\s+(?:level|levelup)\s+<@\d{18}>\s+\w+/,
+      exec: function(message){
+        var results = /^discobot,\s+(?:level|levelup)\s+<@(\d{18})>\s+(\w+)/.exec(message.content);
+        if(results != null){
+          var user = results[1];
+          if(!skills[user]){
+            skills[user] = {};
+          }
+          if(!skills[user][results[2]]){
+            skills[user][results[2]] = 1;
+          }else{
+            skills[user][results[2]]++;
+          }
+          bot.sendMessage(message, "<@"+user+"> 's "+results[2]+
+            " skill was leveled to "+skills[user][results[2]]+"!"
+          );
+          fs.open("stats.json","w+", function(err, fd){
+            if(err){
+              console.error(
+                chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+                " [ERROR] "+err)
+              );
+            }else{
+              fs.write(fd, JSON.stringify(skills), function(err){
+                if(err)
+                  console.error(
+                    chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
+                    " [ERROR] "+err)
+                  );
+                fs.close(fd);
+              });
+            }
+          });
+        }
+      }
+    },
     // {
     //   match:/^discobot,\s+create\s+vote\s+[\w\s?!.]+,[\w\s?!.,]+/,
     //   exec: function(message){
