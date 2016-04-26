@@ -333,9 +333,9 @@ module.exports = function(bot, botInfo){
       }
     },
     {
-      match:/^discobot,\s+(?:level|levelup)\s+<@\d{18}>\s+\w+/,
+      match:/^discobot,\s+(?:level|levelup)\s+<@\d+>\s+\w+/,
       exec: function(message){
-        var results = /^discobot,\s+(?:level|levelup)\s+<@(\d{18})>\s+(\w+)/.exec(message.content);
+        var results = /^discobot,\s+(?:level|levelup)\s+<@(\d+)>\s+(\w+)/.exec(message.content);
         if(results != null){
           var user = results[1];
           if(!skills[user]){
