@@ -6,7 +6,7 @@ var chalk = require("chalk");
 var quotes = {};
 readJSON("quotes.json", function(jsonShit){ quotes = jsonShit; });
 var skills = {};
-readJSON("stats.json", function(jsonShit){ skills = jsonShit; });
+readJSON("skills.json", function(jsonShit){ skills = jsonShit; });
 
 module.exports = function(bot, botInfo){
   return [
@@ -349,7 +349,7 @@ module.exports = function(bot, botInfo){
           bot.sendMessage(message, "<@"+user+"> 's "+results[2]+
             " skill was leveled to "+skills[user][results[2]]+"!"
           );
-          fs.open("stats.json","w+", function(err, fd){
+          fs.open("skills.json","w+", function(err, fd){
             if(err){
               console.error(
                 chalk.bold.red(moment().format("YYYY MMM D, hh:mm:ss A ZZ")+
